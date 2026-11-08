@@ -11,17 +11,6 @@ ESP32 + accelerometer on the neck  ──USB/Bluetooth──▶  phone app  ─�
                          University of Pittsburgh dataset ──▶ train.py ──▶ model.json ────────┘
 ```
 
-## Status
-
-| Part | File | Status |
-|---|---|---|
-| Download the dataset | `download_data.py` | Ready |
-| Turn 1 s of movement into 15 measurements | `features.py` | Ready |
-| Train and test on patients the model never saw | `train.py` | Ready, pipeline tested |
-| API the app calls | `server.py` | Ready |
-| Self-test with fake data (no download needed) | `test_backend.py` | Ready |
-| Trained model on the real dataset | `model.json` | Next (needs the 1.4 GB download) |
-| Connect the app and ESP32 to the API | `frontend/`, `hardware/` | Next |
 
 ## The data
 
