@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neurex</title>
+<meta name="description" content="Neurex: catches silent choking in Parkinson's and calls for help.">
+<meta name="theme-color" content="#f3f6f4">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Neurex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><img src="icons/icon-192.png" alt="" width="30" height="30"><b>Neurex</b></div>
+    <span class="livepill" id="livePill"><i></i><span id="liveText">Ready</span></span>
+    <button class="icon-btn" id="soundBtn" data-act="sound" aria-label="Sound on" aria-pressed="true">
+      <svg class="snd-on" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 010 7M18.5 6a8.5 8.5 0 010 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg class="snd-off" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M17 9l5 6M22 9l-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <button class="icon-btn" data-act="settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div id="demoBar" class="demobar" hidden aria-live="polite"></div>
+  <!-- LIVE (the person wearing the band) -->
+  <section id="view-live" class="view live" aria-label="Live">
+    <div class="live-grid">
+      <div class="col-main">
+        <div class="card graph-card" id="graphCard">
+          <div class="g-top">
+            <div><h3>What the band senses</h3><p class="sub" id="winLabel">4 sensors, live. Hover a shaded swallow for its result.</p></div>
+            <div class="g-right">
+              <span class="bandstat" id="bandStat"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="4.5" y="2" width="7" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M1.5 5v6M14.5 5v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span id="bandText">Band quiet</span></span>
+              <span class="clock mono" id="clock">0:00</span>
+            </div>
+          </div>
+          <div id="graphHome"><div class="canvas-wrap" id="graphWrap"><canvas id="strip" aria-label="Four live sensor signals: throat vibration, breathing, voice box lift, swallow muscles"></canvas></div></div>
+          <div class="lane-key">
+            <span><i style="background:var(--good-soft);border-color:var(--good)"></i>Safe</span>
+            <span><i style="background:var(--warn-soft);border-color:var(--warn)"></i>One sign (logged)</span>
+            <span><i style="background:var(--risk-soft);border-color:var(--risk)"></i>Risky (2+ signs agree)</span>
+            <span><i style="background:var(--amber-soft);border-color:var(--amber)"></i>Coughed after</span>
+          </div>
+          <div id="verdict" class="verdict" aria-live="polite"></div>
+          <details class="swlog" id="swLog">
+            <summary><span>Swallow log</span><span class="fine" id="swLogCount">Every swallow this meal, to look back on later</span></summary>
+            <div class="tablewrap" id="swLogBody"></div>
+          </details>
+        </div>
+      </div>
+      <div class="col-side">
+        <div class="stats3 o1">
+          <div><b data-bind="swallows">0</b><span>swallows</span></div>
+          <div><b data-bind="risky">0</b><span>risky</span></div>
+          <div><b data-bind="cues">0</b><span>band cues</span></div>
+        </div>
+        <div id="nowCard" class="now o2"></div>
+        <button id="mealBtn" class="btn primary meal-btn o4" data-act="meal">Start a meal</button>
+        <div class="feed-head o5"><span>This meal</span><span id="feedCount"></span></div>
+        <ul id="feed" class="feed o6"></ul>
+        <button class="btn help-btn o7" data-act="help">I need help</button>
+        <div id="contactCard" class="card o8"></div>
+        <p class="fine center o9">Demo mode: sensor readings are simulated. 911 is never dialled.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRAPHS (family and doctors) -->
+  <section id="view-graphs" class="view wide" aria-label="Graphs" hidden>
+    <div class="card ghead" id="gHead"></div>
+    <div class="kpis" id="gKpi"></div>
+    <div class="grid2">
+      <div class="card span2"><h3>Risky swallows per day</h3><p class="sub">Share of swallows with 2 or more warning signs. Dashed line: 10% check line (example).</p><div class="chart" id="gRisky"></div><p class="fine" id="gRiskyNote"></p></div>
+      <div class="card"><h3>Voice box lift strength</h3><p class="sub">Average per day, compared with his usual swallow</p><div class="chart" id="gStrength"></div></div>
+      <div class="card"><h3>Riskiest meal</h3><p class="sub">Last 7 days</p><div class="chart" id="gMeal"></div></div>
+      <div class="card span2"><h3>Alerts</h3><p class="sub">Every risky swallow buzz and choking alert, and how it ended</p><div class="tablewrap" id="gAlerts"></div></div>
+      <div class="card span2"><div class="row between"><div><h3>Swallow log</h3><p class="sub" id="gLogSub">Latest meal, every swallow. "Out, swallow, out" is the safe breathing order.</p></div></div><div class="tablewrap" id="gLog"></div></div>
+      <div class="card span2">
+        <h3>Share with the care team</h3>
+        <p class="sub">A plain summary for the speech therapist or doctor.</p>
+        <pre id="gReport" class="report"></pre>
+        <div class="row gap wrap"><button class="btn primary" data-act="share">Share report</button><button class="btn" data-act="copy">Copy</button><button class="btn" data-act="export">Download CSV</button></div>
+        <p class="fine">Neurex flags risk and gets people tested sooner. It does not diagnose.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav class="tabbar" aria-label="Sections">
+  <a href="#live" data-v="live" aria-current="page"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Live</span></a>
+  <a href="#graphs" data-v="graphs"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Graphs</span></a>
+</nav>
+
+<div id="sos" class="sos" hidden role="alertdialog" aria-live="assertive"><div class="sos-inner"><div class="demobar onsos" hidden aria-live="polite"></div><div id="sosBody"></div><div class="sos-side"><div class="sos-graph"><span class="eyebrow">Live from the band</span><div id="sosGraph"></div></div><div id="mayaPhone"></div></div></div></div>
+<div id="sheet" class="sheet" hidden><div class="sheet-card" id="sheetBody"></div></div>
+
+<div id="demo" class="demo" hidden>
+  <button class="demo-toggle" data-act="demo" aria-label="Presenter controls">Presenter</button>
+  <div class="demo-panel">
+    <b>Presenter controls</b>
+    <div class="demo-grid">
+      <button class="btn small primary wide" data-act="dDemo" id="demoBtn">Play the demo</button>
+      <p class="demo-cap wide">3 safe swallows → 1 risky → choking → "Are you OK?" → automatic call → 90 s countdown → help arrives</p>
+      <button class="btn small" data-act="dStart">Start meal</button>
+      <button class="btn small" data-act="dEnd">End meal</button>
+      <button class="btn small" data-scen="safe"><i class="sw good"></i>Safe sip</button>
+      <button class="btn small" data-scen="breathin"><i class="sw warn"></i>Breathes in after</button>
+      <button class="btn small" data-scen="silent"><i class="sw risk"></i>Silent risky</button>
+      <button class="btn small" data-scen="cough"><i class="sw cough"></i>Coughs after sip</button>
+      <button class="btn small" data-scen="fast"><i class="sw risk"></i>Gulping</button>
+      <button class="btn small" data-scen="tired"><i class="sw risk"></i>Tired, weak</button>
+      <button class="btn small danger wide" data-act="dChoke">Choking emergency</button>
+      <button class="btn small wide" data-act="dSkip">Skip to next step</button>
+    </div>
+    <span class="eyebrow">Emergency timer speed</span>
+    <div class="seg"><button data-speed="1" aria-pressed="true">1× real</button><button data-speed="3" aria-pressed="false">3×</button><button data-speed="6" aria-pressed="false">6×</button></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden role="status"></div>
+<div id="tip" class="tip" hidden></div>
+
+<script src="js/store.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/escalation.js"></script>
+<script src="js/call.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/strip.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
